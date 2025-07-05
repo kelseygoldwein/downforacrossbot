@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 
 import requests # for api calls
+import datetime # for puzzles by date
 
 # setup logger and intents
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
@@ -23,6 +24,7 @@ class Client(commands.Bot):
         print(f"Ready to puzzle with {self.user.name}")
 
         try:
+            getPuzzleName("nyt")
             load_dotenv()
             guild = discord.Object(id=os.getenv('TEST_SERVER_ID'))
             synced = await self.tree.sync(guild=GUILD_ID)
@@ -37,10 +39,6 @@ client = Client(command_prefix='!', intents=intents)
 
 puzzle_role = "cruciverbalists"
 
-
-@client.tree.command(name="hello", description="say hello!", guild=GUILD_ID)
-async def sayHello(interaction: discord.Interaction):
-    await interaction.response.send_message(f"Hello!")
 
 @client.tree.command(name="pingme", description="get pinged when a puzzle is posted", guild=GUILD_ID)
 async def pingme(interaction: discord.Interaction):
@@ -60,13 +58,10 @@ async def dontpingme(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("Role doesn't exist")
 
-@client.tree.command(name="puzzlelink", description="send link to downforacross", guild=GUILD_ID)
-async def puzzleLink(interaction: discord.Interaction):
-    await interaction.response.send_message("https://downforacross.com/")
 
 
-@client.tree.command(name="recentpuzzle", description="get the most recently uploaded puzzle", guild=GUILD_ID)
-async def puzzleLink(interaction: discord.Interaction):
+@client.tree.command(name="recentpuzzle", description="send link to the most recently uploaded puzzle", guild=GUILD_ID)
+async def recentLink(interaction: discord.Interaction):
     try:
         await interaction.response.send_message(await makeGame())
 
@@ -74,12 +69,31 @@ async def puzzleLink(interaction: discord.Interaction):
         print(f"Error getting results: {e}")
 
 @client.tree.command(name="nyt", description="send link to today's nyt puzzle", guild=GUILD_ID)
-async def puzzleLink(interaction: discord.Interaction):
+async def nytLink(interaction: discord.Interaction):
     try:
-        await interaction.response.send_message(await makeGame())
+        await interaction.response.send_message(await makeGame(searchTerm = getPuzzleName("nyt")))
 
     except Exception as e:
         print(f"Error getting results: {e}")
+
+@client.tree.command(name="lat", description="send link to today's la times puzzle", guild=GUILD_ID)
+async def latLink(interaction: discord.Interaction):
+    try:
+        await interaction.response.send_message(await makeGame(searchTerm = getPuzzleName("lat")))
+
+    except Exception as e:
+        print(f"Error getting results: {e}")
+
+@client.tree.command(name="usa", description="send link to today's usa today puzzle", guild=GUILD_ID)
+async def usaLink(interaction: discord.Interaction):
+    try:
+        await interaction.response.send_message(await makeGame(searchTerm = getPuzzleName("usa")))
+
+    except Exception as e:
+        print(f"Error getting results: {e}")
+
+
+
 
 async def getResults(resultsPage = 0, pageSize = 50, searchTerm = "", standardSize = "true", miniSize = "true"):
 
@@ -90,7 +104,11 @@ async def getResults(resultsPage = 0, pageSize = 50, searchTerm = "", standardSi
                             f"filter%5BsizeFilter%5D%5BMini%5D={miniSize}&"
                             f"filter%5BsizeFilter%5D%5BStandard%5D={standardSize}"
                             ) 
-    return response.json()
+    responseJson = response.json()
+    if len(responseJson["puzzles"]) == 0:
+        print(f"oops, no results found for {searchTerm}")
+        return None
+    return responseJson
 
 async def getPuzzleID(results, index = 0):
     try:
@@ -113,10 +131,32 @@ def getGameURL(gid):
 
 async def makeGame(resultsPage = 0, pageSize = 50, searchTerm = "", standardSize = "true", miniSize = "true"):
     results = await getResults(resultsPage, pageSize, searchTerm, standardSize, miniSize)
+    if results == None:
+        return "no puzzles found"
     puzzleID = await getPuzzleID(results)
     gameID = await getGID()
     await createGame(puzzleID, gameID)
     return getGameURL(gameID)
 
+def getPuzzleName(publisher, date=datetime.date.today()):
+    match publisher:
+        case "nyt":
+            return date.strftime(f"NY Times, %A, %B {date.day}, %Y")
+        case "lat":
+            return date.strftime(f"L. A. Times, %a, %b {date.day}, %Y")
+        case "usa":
+            return date.strftime(f"USA Today %A, %b %d, %Y")
+        case "wsj":
+            return date.strftime(f"WSJ %A, %b %d, %Y")
+        case "newsday":
+            return date.strftime(f"Newsday %A, %b %d, %Y")
+        case "universal":
+            return date.strftime(f"Universal Crossword %A")
+        case "atlantic":
+            return date.strftime(f"Atlantic %A, %b %d, %Y")
+        case _:
+            print(f"error for publisher {publisher}")
+            return ""
+    
 
 client.run(token, log_handler=handler, log_level=logging.DEBUG)
