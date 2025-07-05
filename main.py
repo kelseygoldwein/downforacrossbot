@@ -4,6 +4,20 @@ import logging
 from dotenv import load_dotenv
 import os
 
+import requests # for api calls
+
+# setup logger and intents
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+intents = discord.Intents.default()
+intents.message_content = True
+intents.members = True
+
+# pull secret numbers from .env file
+load_dotenv()
+token = os.getenv('DISCORD_TOKEN')
+GUILD_ID = discord.Object(id=os.getenv('TEST_SERVER_ID'))
+    
+
 class Client(commands.Bot):
     async def on_ready(self):
         print(f"Ready to puzzle with {self.user.name}")
@@ -16,26 +30,13 @@ class Client(commands.Bot):
         except Exception as e:
                 print(f"Error syncing commands: {e}")
 
-
-# pull secret numbers from .env file
-load_dotenv()
-token = os.getenv('DISCORD_TOKEN')
-GUILD_ID = discord.Object(id=os.getenv('TEST_SERVER_ID'))
-    
-# setup logger and intents
-handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
-intents = discord.Intents.default()
-intents.message_content = True
-intents.members = True
-
 # prefix sorta irrelevant, not used
 client = Client(command_prefix='!', intents=intents)
 
-### END SETUP ###
-
-
-
 puzzle_role = "cruciverbalists"
+response = requests.get("https://api.foracross.com/api/puzzle_list?page=0&pageSize=50&filter%5BnameOrTitleFilter%5D=&filter%5BsizeFilter%5D%5BMini%5D=true&filter%5BsizeFilter%5D%5BStandard%5D=true") 
+print(response.status_code)
+
 
 @client.tree.command(name="hello", description="say hello!", guild=GUILD_ID)
 async def sayHello(interaction: discord.Interaction):
