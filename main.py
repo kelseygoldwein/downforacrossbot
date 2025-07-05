@@ -42,22 +42,22 @@ async def sayHello(interaction: discord.Interaction):
     await interaction.response.send_message(f"Hello!")
 
 @client.tree.command(name="pingme", description="get pinged when a puzzle is posted", guild=GUILD_ID)
-async def pingme(ctx):
-    role = discord.utils.get(ctx.guild.roles, name=puzzle_role)
+async def pingme(interaction: discord.Interaction):
+    role = discord.utils.get(interaction.guild.roles, name=puzzle_role)
     if role:
-        await ctx.author.add_roles(role)
-        await ctx.send(f"{ctx.author.mention} is now assigned to {puzzle_role}")
+        await interaction.user.add_roles(role)
+        await interaction.response.send_message(f"{interaction.user.mention} is a {puzzle_role}")
     else:
-        await ctx.send("Role doesn't exist")
+        await interaction.response.send_message("Role doesn't exist")
 
 @client.tree.command(name="dontpingme", description="stop getting pinged when a puzzle is posted", guild=GUILD_ID)
-async def dontpingme(ctx):
-    role = discord.utils.get(ctx.guild.roles, name=puzzle_role)
+async def dontpingme(interaction: discord.Interaction):
+    role = discord.utils.get(interaction.guild.roles, name=puzzle_role)
     if role:
-        await ctx.author.remove_roles(role)
-        await ctx.send(f"{ctx.author.mention} has had the {puzzle_role} removed")
+        await interaction.user.remove_roles(role)
+        await interaction.response.send_message(f"{interaction.user.mention} is not a {puzzle_role}")
     else:
-        await ctx.send("Role doesn't exist")
+        await interaction.response.send_message("Role doesn't exist")
 
 
 
