@@ -59,33 +59,13 @@ async def dontpingme(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("Role doesn't exist")
 
+@client.tree.command(name="puzzlelink", description="send link to downforacross", guild=GUILD_ID)
+async def puzzleLink(interaction: discord.Interaction):
+    await interaction.response.send_message("https://downforacross.com/")
+
+@client.tree.command(name="nyt", description="send link to today's nyt puzzle", guild=GUILD_ID)
+async def puzzleLink(interaction: discord.Interaction):
+    await interaction.response.send_message("https://downforacross.com/")
 
 
 client.run(token, log_handler=handler, log_level=logging.DEBUG)
-
-
-### OLD CODE STARTS HERE, JUST REFERENCE ###
-# @bot.command()
-# async def dm(ctx, *, msg):
-#     await ctx.author.send(f"You said {msg}")
-
-# @bot.command()
-# async def reply(ctx):
-#     await ctx.reply("This is a reply to your message!")
-
-# @bot.command()
-# async def poll(ctx, *, question):
-#     embed = discord.Embed(title="New Poll", description=question)
-#     poll_message = await ctx.send(embed=embed)
-#     await poll_message.add_reaction("👍")
-#     await poll_message.add_reaction("👎")
-
-# @bot.command()
-# @commands.has_role(puzzle_role)
-# async def secret(ctx):
-#     await ctx.send("Welcome to the club!")
-
-# @secret.error
-# async def secret_error(ctx, error):
-#     if isinstance(error, commands.MissingRole):
-#         await ctx.send("You do not have permission to do that!")
