@@ -28,14 +28,14 @@ class Client(commands.Bot):
             synced = await self.tree.sync(guild=GUILD_ID)
             print(f"Synced commands to guild {guild.id}")
         except Exception as e:
-                print(f"Error syncing commands: {e}")
+            print(f"Error syncing commands: {e}")
+
+        
 
 # prefix sorta irrelevant, not used
 client = Client(command_prefix='!', intents=intents)
 
 puzzle_role = "cruciverbalists"
-response = requests.get("https://api.foracross.com/api/puzzle_list?page=0&pageSize=50&filter%5BnameOrTitleFilter%5D=&filter%5BsizeFilter%5D%5BMini%5D=true&filter%5BsizeFilter%5D%5BStandard%5D=true") 
-print(response.status_code)
 
 
 @client.tree.command(name="hello", description="say hello!", guild=GUILD_ID)
@@ -64,9 +64,52 @@ async def dontpingme(interaction: discord.Interaction):
 async def puzzleLink(interaction: discord.Interaction):
     await interaction.response.send_message("https://downforacross.com/")
 
+
+@client.tree.command(name="recentpuzzle", description="get the most recently uploaded puzzle", guild=GUILD_ID)
+async def puzzleLink(interaction: discord.Interaction):
+    try:
+        results = await getResults()
+        puzzleID = await getPuzzleID(results)
+        gameID = await getGID()
+        await createGame(puzzleID, gameID)
+        puzzleLink = getGameURL(gameID)
+        await interaction.response.send_message(puzzleLink)
+
+    except Exception as e:
+        print(f"Error getting results: {e}")
+
 @client.tree.command(name="nyt", description="send link to today's nyt puzzle", guild=GUILD_ID)
 async def puzzleLink(interaction: discord.Interaction):
     await interaction.response.send_message("https://downforacross.com/")
 
+async def getResults(resultsPage = 0, pageSize = 50, searchTerm = "", standardSize = "true", miniSize = "true"):
+
+    response = requests.get(f"https://api.foracross.com/api/puzzle_list?"
+                            f"page={resultsPage}&"
+                            f"pageSize={pageSize}&"
+                            f"filter%5BnameOrTitleFilter%5D={searchTerm}&"
+                            f"filter%5BsizeFilter%5D%5BMini%5D={miniSize}&"
+                            f"filter%5BsizeFilter%5D%5BStandard%5D={standardSize}"
+                            ) 
+    return response.json()
+
+async def getPuzzleID(results, index = 0):
+    try:
+        return results["puzzles"][index]["pid"]
+
+    except Exception as e:
+        print(f"Error getting results: {e}")
+
+async def getGID():
+    gidCounter = requests.post("https://api.foracross.com/api/counters/gid")
+    gidCounterJson = gidCounter.json()
+    return gidCounterJson["gid"]
+
+async def createGame(pid, gid):
+    data = {"gid":gid, "pid":pid}
+    requests.post("https://api.foracross.com/api/game", json=data)
+
+def getGameURL(gid):
+    return f"https://downforacross.com/beta/game/{gid}"
 
 client.run(token, log_handler=handler, log_level=logging.DEBUG)
