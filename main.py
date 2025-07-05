@@ -68,19 +68,18 @@ async def puzzleLink(interaction: discord.Interaction):
 @client.tree.command(name="recentpuzzle", description="get the most recently uploaded puzzle", guild=GUILD_ID)
 async def puzzleLink(interaction: discord.Interaction):
     try:
-        results = await getResults()
-        puzzleID = await getPuzzleID(results)
-        gameID = await getGID()
-        await createGame(puzzleID, gameID)
-        puzzleLink = getGameURL(gameID)
-        await interaction.response.send_message(puzzleLink)
+        await interaction.response.send_message(await makeGame())
 
     except Exception as e:
         print(f"Error getting results: {e}")
 
 @client.tree.command(name="nyt", description="send link to today's nyt puzzle", guild=GUILD_ID)
 async def puzzleLink(interaction: discord.Interaction):
-    await interaction.response.send_message("https://downforacross.com/")
+    try:
+        await interaction.response.send_message(await makeGame())
+
+    except Exception as e:
+        print(f"Error getting results: {e}")
 
 async def getResults(resultsPage = 0, pageSize = 50, searchTerm = "", standardSize = "true", miniSize = "true"):
 
@@ -111,5 +110,13 @@ async def createGame(pid, gid):
 
 def getGameURL(gid):
     return f"https://downforacross.com/beta/game/{gid}"
+
+async def makeGame(resultsPage = 0, pageSize = 50, searchTerm = "", standardSize = "true", miniSize = "true"):
+    results = await getResults(resultsPage, pageSize, searchTerm, standardSize, miniSize)
+    puzzleID = await getPuzzleID(results)
+    gameID = await getGID()
+    await createGame(puzzleID, gameID)
+    return getGameURL(gameID)
+
 
 client.run(token, log_handler=handler, log_level=logging.DEBUG)
