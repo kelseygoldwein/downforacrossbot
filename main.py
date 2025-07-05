@@ -59,40 +59,16 @@ async def dontpingme(interaction: discord.Interaction):
         await interaction.response.send_message("Role doesn't exist")
 
 
+# TODO send as embeds not links
 
-@client.tree.command(name="recentpuzzle", description="send link to the most recently uploaded puzzle", guild=GUILD_ID)
-async def recentLink(interaction: discord.Interaction):
+
+@client.tree.command(name="puzzle", description="start a puzzle", guild=GUILD_ID)
+async def startPuzzle(interaction: discord.Interaction, publisher: str = ""):
     try:
-        await interaction.response.send_message(await makeGame())
+        await interaction.response.send_message(await makeGame(searchTerm = getPuzzleName(publisher)))
 
     except Exception as e:
         print(f"Error getting results: {e}")
-
-@client.tree.command(name="nyt", description="send link to today's nyt puzzle", guild=GUILD_ID)
-async def nytLink(interaction: discord.Interaction):
-    try:
-        await interaction.response.send_message(await makeGame(searchTerm = getPuzzleName("nyt")))
-
-    except Exception as e:
-        print(f"Error getting results: {e}")
-
-@client.tree.command(name="lat", description="send link to today's la times puzzle", guild=GUILD_ID)
-async def latLink(interaction: discord.Interaction):
-    try:
-        await interaction.response.send_message(await makeGame(searchTerm = getPuzzleName("lat")))
-
-    except Exception as e:
-        print(f"Error getting results: {e}")
-
-@client.tree.command(name="usa", description="send link to today's usa today puzzle", guild=GUILD_ID)
-async def usaLink(interaction: discord.Interaction):
-    try:
-        await interaction.response.send_message(await makeGame(searchTerm = getPuzzleName("usa")))
-
-    except Exception as e:
-        print(f"Error getting results: {e}")
-
-
 
 
 async def getResults(resultsPage = 0, pageSize = 50, searchTerm = "", standardSize = "true", miniSize = "true"):
