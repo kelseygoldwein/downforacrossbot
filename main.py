@@ -7,6 +7,7 @@ import os
 import requests # for api calls
 import datetime # for puzzles by date
 from typing import Literal # for autocomplete
+import re # for date format checking
 
 # setup logger and intents
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
@@ -65,9 +66,19 @@ async def dontpingme(interaction: discord.Interaction):
 
 @client.tree.command(name="puzzle", description="start a puzzle", guild=GUILD_ID)
 async def startPuzzle(interaction: discord.Interaction, 
-                        publisher: Literal["nyt", "lat", "usa", "wsj", "newsday", "universal", "atlantic"]):
+                        publisher: Literal["nyt", "lat", "usa", "wsj", "newsday", "universal", "atlantic"],
+                        date: str = ""):
     try:
-        await interaction.response.send_message(await makeGame(searchTerm = getPuzzleName(publisher)))
+        dateFormat = re.compile(r"^[0-1]?\d\/[0-3]?\d(\/[1-2]\d\d\d)?$")
+        
+        if dateFormat.match(date):
+            dateParts = date.split("/")
+            year = datetime.date.today().year if len(dateParts) == 2 else int(dateParts[2])
+
+            puzzleDate = datetime.date(year, int(dateParts[0]), int(dateParts[1]))
+            await interaction.response.send_message(await makeGame(searchTerm = getPuzzleName(publisher, puzzleDate)))
+        else:
+            await interaction.response.send_message(await makeGame(searchTerm = getPuzzleName(publisher)))
 
     except Exception as e:
         print(f"Error getting results: {e}")
