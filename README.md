@@ -19,3 +19,4 @@ Setup a .env file with
 - nextPuzzle command
 - check done
 - stats
+- look into hosting - github?
