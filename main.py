@@ -9,6 +9,8 @@ import datetime # for puzzles by date
 from typing import Literal # for autocomplete
 import re # for date format checking
 
+import puzzle_utils
+
 # setup logger and intents
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 intents = discord.Intents.default()
@@ -26,7 +28,6 @@ class Client(commands.Bot):
         print(f"Ready to puzzle with {self.user.name}")
 
         try:
-            getPuzzleName("nyt")
             load_dotenv()
             guild = discord.Object(id=os.getenv('TEST_SERVER_ID'))
             synced = await self.tree.sync(guild=GUILD_ID)
@@ -71,78 +72,21 @@ async def startPuzzle(interaction: discord.Interaction,
             year = datetime.date.today().year if len(dateParts) == 2 else int(dateParts[2])
 
             puzzleDate = datetime.date(year, int(dateParts[0]), int(dateParts[1]))
-            puzzleName = getPuzzleName(publisher, puzzleDate)
+            puzzleName = puzzle_utils.getPuzzleName(publisher, puzzleDate)
         else:
-            puzzleName = getPuzzleName(publisher)
+            puzzleName = puzzle_utils.getPuzzleName(publisher)
 
-        await interaction.response.send_message(await makeGame(searchTerm = puzzleName))
-
-    except Exception as e:
-        print(f"Error getting results: {e}")
-
-
-async def getResults(resultsPage = 0, pageSize = 50, searchTerm = "", standardSize = "true", miniSize = "true"):
-
-    response = requests.get(f"https://api.foracross.com/api/puzzle_list?"
-                            f"page={resultsPage}&"
-                            f"pageSize={pageSize}&"
-                            f"filter%5BnameOrTitleFilter%5D={searchTerm}&"
-                            f"filter%5BsizeFilter%5D%5BMini%5D={miniSize}&"
-                            f"filter%5BsizeFilter%5D%5BStandard%5D={standardSize}"
-                            ) 
-    responseJson = response.json()
-    if len(responseJson["puzzles"]) == 0:
-        print(f"oops, no results found for {searchTerm}")
-        return None
-    return responseJson
-
-async def getPuzzleID(results, index = 0):
-    try:
-        return results["puzzles"][index]["pid"]
+        await interaction.response.send_message(await puzzle_utils.makeGame(searchTerm = puzzleName))
 
     except Exception as e:
         print(f"Error getting results: {e}")
 
-async def getGID():
-    gidCounter = requests.post("https://api.foracross.com/api/counters/gid")
-    gidCounterJson = gidCounter.json()
-    return gidCounterJson["gid"]
+# TODO send as embeds not links
+# TODO actually ping ppl
+# TODO nextPuzzle command
+# TODO check done
+# TODO stats
 
-async def createGame(pid, gid):
-    data = {"gid":gid, "pid":pid}
-    requests.post("https://api.foracross.com/api/game", json=data)
 
-def getGameURL(gid):
-    return f"https://downforacross.com/beta/game/{gid}"
-
-async def makeGame(resultsPage = 0, pageSize = 50, searchTerm = "", standardSize = "true", miniSize = "true"):
-    results = await getResults(resultsPage, pageSize, searchTerm, standardSize, miniSize)
-    if results == None:
-        return "no puzzles found"
-    puzzleID = await getPuzzleID(results)
-    gameID = await getGID()
-    await createGame(puzzleID, gameID)
-    return getGameURL(gameID)
-
-def getPuzzleName(publisher, date=datetime.date.today()):
-    match publisher:
-        case "nyt":
-            return date.strftime(f"NY Times, %A, %B {date.day}, %Y")
-        case "lat":
-            return date.strftime(f"L. A. Times, %a, %b {date.day}, %Y")
-        case "usa":
-            return date.strftime(f"USA Today %A, %b %d, %Y")
-        case "wsj":
-            return date.strftime(f"WSJ %A, %b %d, %Y")
-        case "newsday":
-            return date.strftime(f"Newsday %A, %b %d, %Y")
-        case "universal":
-            return date.strftime(f"Universal Crossword %A")
-        case "atlantic":
-            return date.strftime(f"Atlantic %A, %b %d, %Y")
-        case _:
-            print(f"error for publisher {publisher}")
-            return ""
-    
 
 client.run(token, log_handler=handler, log_level=logging.DEBUG)
