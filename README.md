@@ -1,4 +1,5 @@
 # DownForAcross Discord Bot
+discord bot that sends downforacross crossword puzzle links :) 
 
 ## Commands
 - pingme
