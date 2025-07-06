@@ -21,7 +21,7 @@ intents.members = True
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 GUILD_ID = discord.Object(id=os.getenv('TEST_SERVER_ID'))
-    
+
 
 class Client(commands.Bot):
     async def on_ready(self):
@@ -56,10 +56,6 @@ async def pingme(interaction: discord.Interaction, toggle: Literal["yes", "no"])
     else:
         await interaction.response.send_message("Role doesn't exist")
 
-
-# TODO send as embeds not links
-
-
 @client.tree.command(name="puzzle", description="start a puzzle", guild=GUILD_ID)
 async def startPuzzle(interaction: discord.Interaction, 
                         publisher: Literal["nyt", "lat", "usa", "wsj", "newsday", "universal", "atlantic"],
@@ -80,13 +76,6 @@ async def startPuzzle(interaction: discord.Interaction,
 
     except Exception as e:
         print(f"Error getting results: {e}")
-
-# TODO send as embeds not links
-# TODO actually ping ppl
-# TODO nextPuzzle command
-# TODO check done
-# TODO stats
-
 
 
 client.run(token, log_handler=handler, log_level=logging.DEBUG)
