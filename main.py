@@ -42,21 +42,16 @@ client = Client(command_prefix='!', intents=intents)
 puzzle_role = "cruciverbalists"
 
 
-@client.tree.command(name="pingme", description="get pinged when a puzzle is posted", guild=GUILD_ID)
-async def pingme(interaction: discord.Interaction):
+@client.tree.command(name="pingme", description="change if you get pinged when a puzzle is posted", guild=GUILD_ID)
+async def pingme(interaction: discord.Interaction, toggle: Literal["yes", "no"]):
     role = discord.utils.get(interaction.guild.roles, name=puzzle_role)
     if role:
-        await interaction.user.add_roles(role)
-        await interaction.response.send_message(f"{interaction.user.mention} is a {puzzle_role}")
-    else:
-        await interaction.response.send_message("Role doesn't exist")
-
-@client.tree.command(name="dontpingme", description="stop getting pinged when a puzzle is posted", guild=GUILD_ID)
-async def dontpingme(interaction: discord.Interaction):
-    role = discord.utils.get(interaction.guild.roles, name=puzzle_role)
-    if role:
-        await interaction.user.remove_roles(role)
-        await interaction.response.send_message(f"{interaction.user.mention} is not a {puzzle_role}")
+        if toggle == "yes":
+            await interaction.user.add_roles(role)
+            await interaction.response.send_message(f"{interaction.user.mention} will now be pinged for puzzles", ephemeral = True)
+        else:
+            await interaction.user.remove_roles(role)
+            await interaction.response.send_message(f"{interaction.user.mention} will no longer be pinged for puzzles", ephemeral = True)
     else:
         await interaction.response.send_message("Role doesn't exist")
 
