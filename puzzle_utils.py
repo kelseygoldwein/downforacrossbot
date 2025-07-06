@@ -39,7 +39,7 @@ def getGameURL(gid):
 async def makeGame(resultsPage = 0, pageSize = 50, searchTerm = "", standardSize = "true", miniSize = "true"):
     results = await getResults(resultsPage, pageSize, searchTerm, standardSize, miniSize)
     if results == None:
-        return "no puzzles found"
+        return None
     puzzleID = await getPuzzleID(results)
     gameID = await getGID()
     await createGame(puzzleID, gameID)

@@ -70,7 +70,11 @@ async def startPuzzle(interaction: discord.Interaction,
         else:
             puzzleName = puzzle_utils.getPuzzleName(publisher)
 
-        await interaction.response.send_message(await puzzle_utils.makeGame(searchTerm = puzzleName))
+        game = await puzzle_utils.makeGame(searchTerm = puzzleName)
+        if game == None:
+            await interaction.response.send_message(f"no puzzles found for {puzzleName}", ephemeral=True)
+        else:
+            await interaction.response.send_message(game)
 
     except Exception as e:
         print(f"Error getting results: {e}")
