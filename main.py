@@ -16,10 +16,11 @@ class Client(commands.Bot):
         print(f"Ready to puzzle with {self.user.name}")
 
         try:
-            load_dotenv()
-            guild = discord.Object(id=os.getenv('TEST_SERVER_ID'))
-            await self.tree.sync(guild=GUILD_ID)
-            print(f"Synced commands to guild {guild.id}")
+            # force guilds in .env to update their slash commands
+            for gID in guildIDs:
+                self.tree.copy_global_to(guild=discord.Object(id=gID))
+                await self.tree.sync(guild=discord.Object(id=gID))
+                print(f"Synced commands to guild {gID}")
         except Exception as e:
             print(f"Error syncing commands: {e}")
 
@@ -35,15 +36,14 @@ client = Client(command_prefix='!', intents=intents) # prefix sorta irrelevant, 
 # pull values from .env
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
-puzzle_role = os.getenv("PUZZLE_ROLE")
-guildID = os.getenv('TEST_SERVER_ID')
+puzzleRole = os.getenv('PUZZLE_ROLE')
+guildIDs = os.getenv('SERVER_IDS').split(", ")
+testGuild = discord.Object(id=os.getenv('TEST_SERVER_ID'))
 
-GUILD_ID = discord.Object(id=guildID)
 
-
-@client.tree.command(name="pingme", description="change if you get pinged when a puzzle is posted", guild=GUILD_ID)
+@client.tree.command(name="pingme", description="change if you get pinged when a puzzle is posted", guild=testGuild)
 async def pingme(interaction: discord.Interaction, toggle: Literal["yes", "no"]):
-    role = discord.utils.get(interaction.guild.roles, name=puzzle_role)
+    role = discord.utils.get(interaction.guild.roles, name=puzzleRole)
     if role:
         if toggle == "yes":
             await interaction.user.add_roles(role)
@@ -54,7 +54,7 @@ async def pingme(interaction: discord.Interaction, toggle: Literal["yes", "no"])
     else:
         await interaction.response.send_message("Role doesn't exist")
 
-@client.tree.command(name="puzzle", description="start a puzzle", guild=GUILD_ID)
+@client.tree.command(name="puzzle", description="start a puzzle")
 async def startPuzzle(interaction: discord.Interaction, 
                         publisher: Literal["nyt", "lat", "usa", "wsj", "newsday", "universal", "atlantic"],
                         date: str = ""):
