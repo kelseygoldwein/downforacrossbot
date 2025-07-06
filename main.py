@@ -76,9 +76,11 @@ async def startPuzzle(interaction: discord.Interaction,
             year = datetime.date.today().year if len(dateParts) == 2 else int(dateParts[2])
 
             puzzleDate = datetime.date(year, int(dateParts[0]), int(dateParts[1]))
-            await interaction.response.send_message(await makeGame(searchTerm = getPuzzleName(publisher, puzzleDate)))
+            puzzleName = getPuzzleName(publisher, puzzleDate)
         else:
-            await interaction.response.send_message(await makeGame(searchTerm = getPuzzleName(publisher)))
+            puzzleName = getPuzzleName(publisher)
+
+        await interaction.response.send_message(await makeGame(searchTerm = puzzleName))
 
     except Exception as e:
         print(f"Error getting results: {e}")
