@@ -6,6 +6,7 @@ import os
 
 import requests # for api calls
 import datetime # for puzzles by date
+from typing import Literal # for autocomplete
 
 # setup logger and intents
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
@@ -63,7 +64,8 @@ async def dontpingme(interaction: discord.Interaction):
 
 
 @client.tree.command(name="puzzle", description="start a puzzle", guild=GUILD_ID)
-async def startPuzzle(interaction: discord.Interaction, publisher: str = ""):
+async def startPuzzle(interaction: discord.Interaction, 
+                        publisher: Literal["nyt", "lat", "usa", "wsj", "newsday", "universal", "atlantic"]):
     try:
         await interaction.response.send_message(await makeGame(searchTerm = getPuzzleName(publisher)))
 
