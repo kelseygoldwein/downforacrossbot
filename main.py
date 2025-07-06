@@ -10,17 +10,6 @@ import re # for date format checking
 
 import puzzle_utils
 
-# setup logger and intents
-handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
-intents = discord.Intents.default()
-intents.message_content = True
-intents.members = True
-
-# pull secret numbers from .env file
-load_dotenv()
-token = os.getenv('DISCORD_TOKEN')
-GUILD_ID = discord.Object(id=os.getenv('TEST_SERVER_ID'))
-
 
 class Client(commands.Bot):
     async def on_ready(self):
@@ -29,17 +18,27 @@ class Client(commands.Bot):
         try:
             load_dotenv()
             guild = discord.Object(id=os.getenv('TEST_SERVER_ID'))
-            synced = await self.tree.sync(guild=GUILD_ID)
+            await self.tree.sync(guild=GUILD_ID)
             print(f"Synced commands to guild {guild.id}")
         except Exception as e:
             print(f"Error syncing commands: {e}")
 
         
+# setup logger and intents
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+intents = discord.Intents.default()
+intents.message_content = True
+intents.members = True
+client = Client(command_prefix='!', intents=intents) # prefix sorta irrelevant, not used
 
-# prefix sorta irrelevant, not used
-client = Client(command_prefix='!', intents=intents)
 
-puzzle_role = "cruciverbalists"
+# pull values from .env
+load_dotenv()
+token = os.getenv('DISCORD_TOKEN')
+puzzle_role = os.getenv("PUZZLE_ROLE")
+guildID = os.getenv('TEST_SERVER_ID')
+
+GUILD_ID = discord.Object(id=guildID)
 
 
 @client.tree.command(name="pingme", description="change if you get pinged when a puzzle is posted", guild=GUILD_ID)
