@@ -4,7 +4,6 @@ import logging
 from dotenv import load_dotenv
 import os
 
-import requests # for api calls
 import datetime # for puzzles by date
 from typing import Literal # for autocomplete
 import re # for date format checking
