@@ -51,8 +51,11 @@ async def makeGame(resultsPage = 0, pageSize = 50, searchTerm = "", standardSize
     await createGame(puzzleID, gameID)
     return getGameURL(gameID)
 
-def getPuzzleName(publisher, date=datetime.date.today()):
+def getPuzzleName(publisher, date=None):
     """returns standard name format of puzzles by a publisher on a given day"""
+    if date == None:
+        date = datetime.date.today()
+    # TODO search by dotw
     match publisher:
         case "nyt":
             return date.strftime(f"NY Times, %A, %B {date.day}, %Y")
