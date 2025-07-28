@@ -60,7 +60,8 @@ def getPuzzleName(publisher, date=None):
         case "nyt":
             return date.strftime(f"NY Times, %A, %B {date.day}, %Y")
         case "lat":
-            return date.strftime(f"L. A. Times, %a, %b {date.day}, %Y")
+            return date.strftime(f"LA Times, %a, %b {date.day}, %Y")
+            # return date.strftime(f"L. A. Times, %a, %b {date.day}, %Y")
         case "usa":
             return date.strftime(f"USA Today %A, %b %d, %Y")
         case "wsj":
