@@ -4,6 +4,8 @@ import logging
 from dotenv import load_dotenv
 import os
 
+import webserver # for hosting
+
 import datetime # for puzzles by date
 from typing import Literal # for autocomplete
 import re # for date format checking
@@ -107,5 +109,5 @@ async def startPuzzleEmbed(interaction: discord.Interaction,
     except Exception as e:
         print(f"Error getting results: {e}")
 
-
+webserver.keep_alive()
 client.run(token, log_handler=handler, log_level=logging.DEBUG)
