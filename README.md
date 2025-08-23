@@ -1,5 +1,6 @@
 # DownForAcross Discord Bot
 discord bot that sends downforacross crossword puzzle links :) 
+hosted by render.com
 
 ## Commands
 - pingme
