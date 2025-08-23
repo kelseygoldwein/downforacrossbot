@@ -41,7 +41,7 @@ token = os.getenv('DISCORD_TOKEN')
 @client.tree.command(name="puzzle", description="start a puzzle")
 @app_commands.describe(
     publisher="where the puzzle came from",
-    date = "date on which the puzzle was published (m/d or m/d/yyy)"
+    date = "date on which the puzzle was published (m/d or m/d/yyyy)"
 )
 async def startPuzzle(interaction: discord.Interaction, 
                         publisher: Literal["nyt", "lat", "usa", "wsj", "newsday", "universal", "atlantic"],
