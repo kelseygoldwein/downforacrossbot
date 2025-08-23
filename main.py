@@ -18,11 +18,8 @@ class Client(commands.Bot):
         print(f"Ready to puzzle with {self.user.name}")
 
         try:
-            # force guilds in .env to update their slash commands
-            for gID in guildIDs:
-                self.tree.copy_global_to(guild=discord.Object(id=gID))
-                await self.tree.sync(guild=discord.Object(id=gID))
-                print(f"Synced commands to guild {gID}")
+            await self.tree.sync()
+            print(f"Synced commands to guilds")
         except Exception as e:
             print(f"Error syncing commands: {e}")
 
@@ -39,7 +36,6 @@ client = Client(command_prefix='!', intents=intents) # prefix sorta irrelevant, 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 puzzleRoleName = os.getenv('PUZZLE_ROLE')
-guildIDs = os.getenv('SERVER_IDS').split(", ")
 testGuild = discord.Object(id=os.getenv('TEST_SERVER_ID'))
 
 
