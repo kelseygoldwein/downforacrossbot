@@ -36,10 +36,9 @@ client = Client(command_prefix='!', intents=intents) # prefix sorta irrelevant, 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 puzzleRoleName = os.getenv('PUZZLE_ROLE')
-testGuild = discord.Object(id=os.getenv('TEST_SERVER_ID'))
 
 
-@client.tree.command(name="pingme", description="change if you get pinged when a puzzle is posted", guild=testGuild)
+@client.tree.command(name="pingme", description="change if you get pinged when a puzzle is posted")
 async def pingme(interaction: discord.Interaction, toggle: Literal["yes", "no"]):
     role = discord.utils.get(interaction.guild.roles, name=puzzleRoleName)
     if role:
@@ -79,7 +78,7 @@ async def startPuzzle(interaction: discord.Interaction,
 
 
 
-@client.tree.command(name="puzzleembed", description="start a puzzle", guild=testGuild)
+@client.tree.command(name="puzzleembed", description="start a puzzle")
 async def startPuzzleEmbed(interaction: discord.Interaction, 
                         publisher: Literal["nyt", "lat", "usa", "wsj", "newsday", "universal", "atlantic"],
                         date: str = ""):
