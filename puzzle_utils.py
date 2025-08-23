@@ -55,12 +55,10 @@ def getPuzzleName(publisher, date=None):
     """returns standard name format of puzzles by a publisher on a given day"""
     if date == None:
         date = datetime.date.today()
-    # TODO search by dotw
     match publisher:
         case "nyt":
             return date.strftime(f"NY Times, %A, %B {date.day}, %Y")
         case "lat":
-            # TODO allow for searching both formats
             return date.strftime(f"LA Times, %a, %b {date.day}, %Y")
             # return date.strftime(f"L. A. Times, %a, %b {date.day}, %Y")
         case "usa":
